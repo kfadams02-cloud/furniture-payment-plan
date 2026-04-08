@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furniture Split — Kurt & Kevin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0e0c;--card:#1a1814;--border:#2e2b25;--gold:#c9a84c;--gold-dim:#7a6530;--cream:#f0e6cc;--muted:#7a7060;--red:#c0614a;--green:#5a9e72;--kurt:#5b8fc9;--kevin:#c97a5b;--util:#7a9e6e;--payments:#c9a84c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--cream);font-family:'DM Mono',monospace;min-height:100vh}
+.wrapper{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+header{border-bottom:1px solid var(--border);padding-bottom:28px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
+.hl{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:10px}
+h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:900;color:var(--cream);line-height:1}
+h1 span{color:var(--gold)}
+.hsub{margin-top:8px;font-size:11px;color:var(--muted);letter-spacing:.07em}
+.edit-btn{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:10px 18px;border-radius:3px;cursor:pointer;transition:background .2s}
+.edit-btn:hover{background:rgba(201,168,76,.18)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#1a1814;border:1px solid var(--border);border-radius:6px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:32px}
+.modal h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);margin-bottom:6px}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.modal-section{margin-bottom:28px}
+.modal-section h3{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field.full{grid-column:1/-1}
+.field label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.field input{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--cream);font-family:'DM Mono',monospace;font-size:12px;padding:8px 10px;border-radius:3px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--gold-dim)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.btn-cancel{background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;padding:9px 18px;border-radius:3px;cursor:pointer}
+.btn-save{background:var(--gold);border:none;color:#0f0e0c;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:9px 20px;border-radius:3px;cursor:pointer}
+.btn-save:hover{background:#d4b055}
+.add-row-btn{background:none;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;padding:7px 14px;border-radius:3px;cursor:pointer;margin-top:6px}
+.add-row-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.charge-header{display:grid;gap:8px;margin-bottom:6px}
+.charge-header span{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.apr-banner{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.22);border-radius:4px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.apr-l{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:3px}
+.apr-t{font-size:13px;color:var(--cream)}
+.apr-t strong{color:var(--gold)}
+.apr-n{font-size:28px;font-weight:700;color:var(--gold);line-height:1}
+.top-stats{background:var(--card);border:1px solid var(--gold-dim);border-radius:4px;padding:20px 24px;margin-bottom:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ts-l{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ts-v{font-size:22px;font-weight:700;color:var(--gold)}
+.ts-v.strike{text-decoration:line-through;font-size:14px;opacity:.4;margin-bottom:2px}
+.ts-s{font-size:10px;color:var(--muted);margin-top:3px}
+.credits-strip{background:rgba(90,158,114,.08);border:1px solid rgba(90,158,114,.25);border-radius:4px;padding:14px 20px;margin-bottom:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cs-l{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.cs-v{font-size:16px;font-weight:700;color:var(--green)}
+.cs-s{font-size:10px;color:var(--muted);margin-top:2px}
+.sec{display:flex;align-items:center;gap:14px;margin:36px 0 14px}
+.sec-t{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);white-space:nowrap}
+.sec-l{flex:1;height:1px;background:var(--border)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bcard{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px}
+.bname{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:16px}
+.bcard.kurt .bname{color:var(--kurt)}
+.bcard.kevin .bname{color:var(--kevin)}
+.bg{margin-bottom:16px}
+.bg-l{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between}
+.bar-track{height:22px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;display:flex}
+.bar-seg{height:100%}
+.spay{background:var(--payments)}
+.scr{background:var(--green)}
+.srem{background:rgba(192,97,74,.22)}
+.bk-rows{margin-top:14px}
+.bk-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(46,43,37,.5);font-size:11px}
+.bk-row:last-child{border-bottom:none}
+.bk-c{display:flex;align-items:center;gap:7px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.bk-v{font-weight:500;color:var(--cream)}
+.bk-div{border-top:1px solid var(--gold-dim);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;font-size:11px;font-weight:500}
+.bk-div span:last-child{color:var(--red)}
+.pbox{margin-top:12px;padding:12px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.18);border-radius:3px;text-align:center}
+.pb-l{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:4px}
+.pb-v{font-size:22px;font-weight:700;color:var(--gold)}
+.pb-v span{font-size:11px;font-weight:400;color:var(--muted)}
+.pb-s{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5}
+.note{font-size:10px;color:var(--muted);margin-top:10px;padding:9px 11px;border-left:2px solid var(--border);line-height:1.8}
+.warn{color:rgba(201,168,76,.8)}
+.personal-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:14px}
+.personal-card.kurt-card{border-top:2px solid var(--kurt)}
+.personal-card.kevin-card{border-top:2px solid var(--kevin)}
+.personal-card.util-card{border-top:2px solid var(--util)}
+.pc-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.pc-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700}
+.kurt-card .pc-name{color:var(--kurt)}
+.kevin-card .pc-name{color:var(--kevin)}
+.util-card .pc-name{color:var(--util)}
+.pc-total{font-size:12px;color:var(--muted)}
+.pc-total span{color:var(--cream);font-weight:500}
+.status-box{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.status-item{flex:1;min-width:90px;padding:10px 12px;border-radius:3px;text-align:center}
+.status-item.owed{background:rgba(192,97,74,.1);border:1px solid rgba(192,97,74,.25)}
+.status-item.paid{background:rgba(90,158,114,.1);border:1px solid rgba(90,158,114,.25)}
+.status-item.split{background:rgba(91,143,201,.08);border:1px solid rgba(91,143,201,.2)}
+.status-item.remaining{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2)}
+.status-item.cleared{background:rgba(90,158,114,.08);border:1px solid rgba(90,158,114,.2)}
+.si-l{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.si-v{font-size:16px;font-weight:700}
+.status-item.owed .si-v{color:var(--red)}
+.status-item.paid .si-v{color:var(--green)}
+.status-item.split .si-v{color:var(--kurt)}
+.status-item.remaining .si-v{color:var(--gold)}
+.status-item.cleared .si-v{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--border);font-weight:400}
+th:last-child{text-align:right}
+td{padding:9px 10px;border-bottom:1px solid rgba(46,43,37,.55);vertical-align:middle}
+td:last-child{text-align:right}
+tr:hover td{background:rgba(255,255,255,.012)}
+tfoot td{padding-top:12px;border-top:1px solid var(--gold-dim);border-bottom:none;color:var(--gold);font-weight:500}
+.tx-date{color:var(--muted);font-size:11px;white-space:nowrap}
+.badge{display:inline-block;font-size:9px;letter-spacing:.09em;text-transform:uppercase;padding:2px 6px;border-radius:2px;font-weight:500}
+.bk{background:rgba(91,143,201,.14);color:var(--kurt);border:1px solid rgba(91,143,201,.23)}
+.bkv{background:rgba(201,122,91,.14);color:var(--kevin);border:1px solid rgba(201,122,91,.23)}
+.bcr{background:rgba(90,158,114,.12);color:var(--green);border:1px solid rgba(90,158,114,.2)}
+.butil{background:rgba(122,158,110,.12);color:var(--util);border:1px solid rgba(122,158,110,.2)}
+footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);letter-spacing:.07em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+@media(max-width:600px){.grid2,.top-stats,.credits-strip,.field-grid{grid-template-columns:1fr}.status-box{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<header>
+  <div>
+    <div class="hl">American Express ••••1007 · Shared Charges Tracker</div>
+    <h1>Furniture <span>Split</span></h1>
+    <div class="hsub">Kurt &nbsp;·&nbsp; Kevin &nbsp;·&nbsp; Oct 2025 – Present</div>
+  </div>
+  <button class="edit-btn" onclick="openModal()">⊞ Update Data</button>
+</header>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>Update Dashboard</h2>
+    <p class="modal-sub">Update any values and click Save. All calculations update automatically. Add rows with + buttons, remove with ×.</p>
+    <div class="modal-section">
+      <h3>Furniture Charges</h3>
+      <div id="furniture-rows"></div>
+      <button class="add-row-btn" onclick="addRow('furniture')">+ Add furniture charge</button>
+    </div>
+    <div class="modal-section">
+      <h3>Amex Credits (applied before split)</h3>
+      <div id="credit-rows"></div>
+      <button class="add-row-btn" onclick="addRow('credit')">+ Add credit</button>
+    </div>
+    <div class="modal-section">
+      <h3>Furniture Payments</h3>
+      <div class="field-grid">
+        <div class="field"><label>Kurt — Card Payments</label><input type="number" id="kurt-furn-paid" step="0.01"></div>
+        <div class="field"><label>Kurt — Plane Ticket Credit</label><input type="number" id="kurt-ticket" step="0.01"></div>
+        <div class="field"><label>Kevin — Furniture Payments</label><input type="number" id="kevin-furn-paid" step="0.01"></div>
+        <div class="field"><label>Kevin — Personal Payments</label><input type="number" id="kevin-pers-paid" step="0.01"></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>Kevin's Personal Charges</h3>
+      <div id="kevin-personal-rows"></div>
+      <button class="add-row-btn" onclick="addRow('kevin-personal')">+ Add Kevin personal charge</button>
+    </div>
+    <div class="modal-section">
+      <h3>Kurt's Utilities (Con Edison)</h3>
+      <div id="kurt-util-rows"></div>
+      <button class="add-row-btn" onclick="addRow('kurt-util')">+ Add utility charge</button>
+      <div class="field-grid" style="margin-top:12px">
+        <div class="field"><label>Kurt — Direct Utility Payments</label><input type="number" id="kurt-util-paid" step="0.01"></div>
+        <div class="field"><label>Kevin — Split Credits (Venmo)</label><input type="number" id="kevin-split-credits" step="0.01"></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>Kurt's Personal Charges</h3>
+      <div id="kurt-personal-rows"></div>
+      <button class="add-row-btn" onclick="addRow('kurt-personal')">+ Add Kurt personal charge</button>
+      <div class="field-grid" style="margin-top:12px">
+        <div class="field"><label>Kurt — Personal Payments Made</label><input type="number" id="kurt-pers-paid" step="0.01"></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>Settings</h3>
+      <div class="field-grid">
+        <div class="field"><label>APR Deadline</label><input type="text" id="apr-deadline"></div>
+        <div class="field"><label>Months Remaining</label><input type="number" id="months-remaining" step="1"></div>
+        <div class="field full"><label>Last Updated</label><input type="text" id="updated-label"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveAndRender()">Save & Update Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<div id="dashboard"></div>
+<footer>
+  <span>Statements: Nov 12 · Dec 12, 2025 · Jan 13 · Feb 10 · Mar 13, 2026 · Activity Apr 5, 2026</span>
+  <span id="footer-updated">50/50 split after credits · Updated Apr 5, 2026</span>
+</footer>
+</div>
+
+<script>
+let data = {
+  furniture:[
+    {date:'Oct 22, 2025',desc:'West Elm',amount:2805.71,by:'Kurt'},
+    {date:'Nov 05, 2025',desc:'West Elm',amount:428.86,by:'Kevin'},
+    {date:'Nov 28, 2025',desc:'West Elm',amount:428.86,by:'Kevin'},
+    {date:'Nov 28, 2025',desc:'Wayfair',amount:185.99,by:'Kevin'},
+    {date:'Nov 29, 2025',desc:"BJ's Wholesale",amount:392.36,by:'Kevin'},
+    {date:'Dec 31, 2025',desc:'Wallniture',amount:336.00,by:'Kevin'},
+  ],
+  credits:[
+    {date:'Nov 07, 2025',desc:'Signup bonus (K5KK:0005)',amount:300.00},
+    {date:'Nov 19, 2025',desc:'Amex cash rebate',amount:32.66},
+    {date:'Dec 27, 2025',desc:'Amex cash rebate',amount:19.95},
+    {date:'Jan 22, 2026',desc:'Amex cash rebate',amount:4.76},
+    {date:'Feb 19, 2026',desc:'Amex cash rebate',amount:3.10},
+    {date:'Mar 26, 2026',desc:'Amex cash rebate',amount:2.06},
+  ],
+  kurtFurnPaid:675.00, kurtTicket:300.00,
+  kevinFurnPaid:140.00, kevinPersPaid:562.00,
+  kevinPersonal:[
+    {date:'Nov 11, 2025',desc:'Mess Hall · Dining',amount:31.41},
+    {date:'Nov 24, 2025',desc:'Weis Markets · Groceries',amount:136.88},
+    {date:'Nov 28, 2025',desc:'Amazon Marketplace · Merchandise',amount:6.52},
+    {date:'Nov 30, 2025',desc:'Amazon.com · Merchandise',amount:37.28},
+    {date:'Jan 23, 2026',desc:'Someday Bar · Dining',amount:36.94},
+    {date:'Jan 26, 2026',desc:'Terminal 1 Bouts · Entertainment',amount:15.97},
+    {date:'Mar 01, 2026',desc:'Hush LLC ×2 · Misc',amount:29.85},
+    {date:'Mar 01, 2026',desc:'Popeyes · Dining',amount:18.50},
+    {date:'Mar 02, 2026',desc:"Raising Cane's · Dining",amount:15.45},
+    {date:'Mar 16, 2026',desc:'CVS Pharmacy · Pharmacy',amount:1.98},
+    {date:'Mar 16, 2026',desc:'Tiki Chick ×3 · Dining/Bar',amount:103.10},
+    {date:'Mar 17, 2026',desc:'Felice Montague · Dining',amount:88.12},
+    {date:'Mar 31, 2026',desc:'Swarthmore College · Education',amount:138.00},
+    {date:'Apr 03, 2026',desc:'Uber Eats · Dining',amount:36.09},
+    {date:'Apr 03, 2026',desc:"BJ's Wholesale · Personal",amount:162.44},
+  ],
+  kurtUtils:[
+    {date:'Dec 01, 2025',desc:'Con Edison',amount:122.99},
+    {date:'Jan 05, 2026',desc:'Con Edison',amount:140.16},
+    {date:'Feb 07, 2026',desc:'Con Edison',amount:129.53},
+    {date:'Mar 04, 2026',desc:'Con Edison',amount:141.54},
+  ],
+  kurtUtilPaid:267.16, kevinSplitCredits:267.26,
+  kurtPersonal:[{date:'Jan 17, 2026',desc:'Wayfair · Personal purchase',amount:127.38}],
+  kurtPersPaid:127.38,
+  aprDeadline:'October 12, 2026', monthsRemaining:6, updatedLabel:'Apr 5, 2026',
+};
+
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const sum=arr=>arr.reduce((a,b)=>a+b,0);
+const inp=()=>`style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--cream);font-family:'DM Mono',monospace;font-size:11px;padding:6px 8px;border-radius:3px;outline:none;width:100%;"`;
+const delbtn=()=>`style="background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;width:28px;height:28px;border-radius:3px;cursor:pointer;"`;
+
+function buildFurnitureRows(){
+  const c=$('furniture-rows'); c.innerHTML='';
+  const h=document.createElement('div');
+  h.style.cssText='display:grid;grid-template-columns:110px 1fr 80px 70px 28px;gap:8px;margin-bottom:6px;';
+  h.innerHTML='<span style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Date</span><span style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Merchant</span><span style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Amount</span><span style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">By</span><span></span>';
+  c.appendChild(h);
+  data.furniture.forEach((item,i)=>{
+    const r=document.createElement('div');
+    r.style.cssText='display:grid;grid-template-columns:110px 1fr 80px 70px 28px;gap:8px;align-items:center;margin-bottom:8px;';
+    r.innerHTML=`<input type="text" value="${item.date}" ${inp()} oninput="data.furniture[${i}].date=this.value"><input type="text" value="${item.desc}" ${inp()} oninput="data.furniture[${i}].desc=this.value"><input type="number" value="${item.amount}" step="0.01" ${inp()} oninput="data.furniture[${i}].amount=parseFloat(this.value)||0"><input type="text" value="${item.by}" ${inp()} oninput="data.furniture[${i}].by=this.value"><button ${delbtn()} onclick="data.furniture.splice(${i},1);buildFurnitureRows()">×</button>`;
+    c.appendChild(r);
+  });
+}
+
+function buildSimpleRows(cid,arr,key){
+  const c=$(cid); c.innerHTML='';
+  arr.forEach((item,i)=>{
+    const r=document.createElement('div');
+    r.style.cssText='display:grid;grid-template-columns:130px 1fr 90px 28px;gap:8px;align-items:center;margin-bottom:8px;';
+    r.innerHTML=`<input type="text" value="${item.date}" ${inp()} oninput="data.${key}[${i}].date=this.value"><input type="text" value="${item.desc}" ${inp()} oninput="data.${key}[${i}].desc=this.value"><input type="number" value="${item.amount}" step="0.01" ${inp()} oninput="data.${key}[${i}].amount=parseFloat(this.value)||0"><button ${delbtn()} onclick="data.${key}.splice(${i},1);buildSimpleRows('${cid}',data.${key},'${key}')">×</button>`;
+    c.appendChild(r);
+  });
+}
+
+function addRow(type){
+  const blank={date:'',desc:'',amount:0};
+  if(type==='furniture'){data.furniture.push({...blank,by:''});buildFurnitureRows();}
+  else if(type==='credit'){data.credits.push({...blank});buildSimpleRows('credit-rows',data.credits,'credits');}
+  else if(type==='kevin-personal'){data.kevinPersonal.push({...blank});buildSimpleRows('kevin-personal-rows',data.kevinPersonal,'kevinPersonal');}
+  else if(type==='kurt-util'){data.kurtUtils.push({...blank});buildSimpleRows('kurt-util-rows',data.kurtUtils,'kurtUtils');}
+  else if(type==='kurt-personal'){data.kurtPersonal.push({...blank});buildSimpleRows('kurt-personal-rows',data.kurtPersonal,'kurtPersonal');}
+}
+
+function openModal(){
+  buildFurnitureRows();
+  buildSimpleRows('credit-rows',data.credits,'credits');
+  buildSimpleRows('kevin-personal-rows',data.kevinPersonal,'kevinPersonal');
+  buildSimpleRows('kurt-util-rows',data.kurtUtils,'kurtUtils');
+  buildSimpleRows('kurt-personal-rows',data.kurtPersonal,'kurtPersonal');
+  $('kurt-furn-paid').value=data.kurtFurnPaid;
+  $('kurt-ticket').value=data.kurtTicket;
+  $('kevin-furn-paid').value=data.kevinFurnPaid;
+  $('kevin-pers-paid').value=data.kevinPersPaid;
+  $('kurt-util-paid').value=data.kurtUtilPaid;
+  $('kevin-split-credits').value=data.kevinSplitCredits;
+  $('kurt-pers-paid').value=data.kurtPersPaid;
+  $('apr-deadline').value=data.aprDeadline;
+  $('months-remaining').value=data.monthsRemaining;
+  $('updated-label').value=data.updatedLabel;
+  $('modal').classList.add('open');
+}
+
+function closeModal(){$('modal').classList.remove('open');}
+
+function saveAndRender(){
+  data.kurtFurnPaid=parseFloat($('kurt-furn-paid').value)||0;
+  data.kurtTicket=parseFloat($('kurt-ticket').value)||0;
+  data.kevinFurnPaid=parseFloat($('kevin-furn-paid').value)||0;
+  data.kevinPersPaid=parseFloat($('kevin-pers-paid').value)||0;
+  data.kurtUtilPaid=parseFloat($('kurt-util-paid').value)||0;
+  data.kevinSplitCredits=parseFloat($('kevin-split-credits').value)||0;
+  data.kurtPersPaid=parseFloat($('kurt-pers-paid').value)||0;
+  data.aprDeadline=$('apr-deadline').value;
+  data.monthsRemaining=parseInt($('months-remaining').value)||6;
+  data.updatedLabel=$('updated-label').value;
+  closeModal(); render();
+}
+
+function render(){
+  const grossFurn=sum(data.furniture.map(x=>x.amount));
+  const totalCredits=sum(data.credits.map(x=>x.amount));
+  const netFurn=grossFurn-totalCredits;
+  const eachOwes=netFurn/2;
+  const months=data.monthsRemaining;
+  const kurtContrib=data.kurtFurnPaid+data.kurtTicket;
+  const kurtRemaining=Math.max(0,eachOwes-kurtContrib);
+  const kurtPct=Math.min(100,(kurtContrib/eachOwes)*100);
+  const kevinRemaining=Math.max(0,eachOwes-data.kevinFurnPaid);
+  const kevinPct=Math.min(100,(data.kevinFurnPaid/eachOwes)*100);
+  const kevinPersTotal=sum(data.kevinPersonal.map(x=>x.amount));
+  const kevinPersRemaining=kevinPersTotal-data.kevinPersPaid;
+  const kurtUtilTotal=sum(data.kurtUtils.map(x=>x.amount));
+  const kurtUtilApplied=data.kurtUtilPaid+data.kevinSplitCredits;
+  const kurtUtilRemaining=kurtUtilTotal-kurtUtilApplied;
+  const utilCleared=kurtUtilRemaining<=0.05;
+  const kurtPersTotal=sum(data.kurtPersonal.map(x=>x.amount));
+  const kurtPersRemaining=kurtPersTotal-data.kurtPersPaid;
+  const persCleared=kurtPersRemaining<=0.01;
+
+  const furnRows=data.furniture.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge ${r.by==='Kurt'?'bk':'bkv'}">${r.by}</span></td><td>${fmt(r.amount)}</td><td>${fmt(r.amount/2)}</td></tr>`).join('');
+  const creditRows=data.credits.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge bcr">Credit</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
+  const kevinPersRows=data.kevinPersonal.map(r=>{const[m,c]=r.desc.split('·').map(s=>s.trim());return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td style="color:var(--muted);font-size:11px">${c||''}</td><td>${fmt(r.amount)}</td></tr>`;}).join('');
+  const kurtUtilRows=data.kurtUtils.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge butil">Utilities</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
+  const kurtPersRows=data.kurtPersonal.map(r=>{const[m,c]=r.desc.split('·').map(s=>s.trim());return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td style="color:var(--muted);font-size:11px">${c||''}</td><td>${fmt(r.amount)}</td></tr>`;}).join('');
+
+  $('footer-updated').textContent=`50/50 split after credits · Updated ${data.updatedLabel}`;
+
+  $('dashboard').innerHTML=`
+    <div class="apr-banner">
+      <div><div class="apr-l">0% Intro APR window</div><div class="apr-t">Expires <strong>${data.aprDeadline}</strong> — pay off before interest kicks in</div></div>
+      <div style="text-align:right"><div class="apr-l">Months remaining</div><div class="apr-n">${months}</div></div>
+    </div>
+    <div class="top-stats">
+      <div><div class="ts-l">Gross furniture charges</div><div class="ts-v strike">${fmt(grossFurn)}</div><div class="ts-v" style="font-size:18px">${fmt(netFurn)}</div><div class="ts-s">After ${fmt(totalCredits)} in credits applied</div></div>
+      <div><div class="ts-l">Each owes (50/50)</div><div class="ts-v">${fmt(eachOwes)}</div><div class="ts-s">Split after credits</div></div>
+      <div><div class="ts-l">Combined paid</div><div class="ts-v">${fmt(data.kurtFurnPaid+data.kevinFurnPaid)}</div><div class="ts-s">Card payments toward furniture</div></div>
+    </div>
+    <div class="credits-strip">
+      <div><div class="cs-l">Signup bonus</div><div class="cs-v">${fmt(data.credits[0]?.amount||0)}</div><div class="cs-s">Amex promo</div></div>
+      <div><div class="cs-l">Cashback rebates</div><div class="cs-v">${fmt(totalCredits-(data.credits[0]?.amount||0))}</div><div class="cs-s">All periods</div></div>
+      <div><div class="cs-l">Total credits</div><div class="cs-v">${fmt(totalCredits)}</div><div class="cs-s">Applied before split</div></div>
+      <div><div class="cs-l">Savings each</div><div class="cs-v">${fmt(totalCredits/2)}</div><div class="cs-s">${fmt(totalCredits)} ÷ 2</div></div>
+    </div>
+    <div class="sec"><div class="sec-t">Furniture split — by person</div><div class="sec-l"></div></div>
+    <div class="grid2">
+      <div class="bcard kurt">
+        <div class="bname">Kurt</div>
+        <div class="bg"><div class="bg-l"><span>Progress toward fair share</span><span>${kurtPct.toFixed(1)}%</span></div>
+          <div class="bar-track"><div class="bar-seg spay" style="width:${(data.kurtFurnPaid/eachOwes*100).toFixed(1)}%"></div><div class="bar-seg scr" style="width:${(data.kurtTicket/eachOwes*100).toFixed(1)}%"></div><div class="bar-seg srem" style="width:${Math.max(0,100-kurtPct).toFixed(1)}%"></div></div>
+        </div>
+        <div class="bk-rows">
+          <div class="bk-row"><div class="bk-c"><div class="dot" style="background:var(--kurt)"></div>Fair share (post-credits)</div><div class="bk-v">${fmt(eachOwes)}</div></div>
+          <div class="bk-row"><div class="bk-c"><div class="dot" style="background:var(--payments)"></div>Card payments</div><div class="bk-v" style="color:var(--green)">${fmt(data.kurtFurnPaid)}</div></div>
+          <div class="bk-row"><div class="bk-c"><div class="dot" style="background:var(--green)"></div>Plane ticket credit</div><div class="bk-v" style="color:var(--green)">${fmt(data.kurtTicket)}</div></div>
+          <div class="bk-row"><div class="bk-c" style="font-size:10px;padding-left:4px">Total contributed</div><div class="bk-v" style="color:var(--green)">${fmt(kurtContrib)}</div></div>
+        </div>
+        <div class="bk-div"><span>Furniture remaining</span><span>${fmt(kurtRemaining)}</span></div>
+        <div class="pbox"><div class="pb-l">Monthly target · ${months} months</div><div class="pb-v">${fmt(kurtRemaining/months)}<span>/mo</span></div><div class="pb-s">${fmt(kurtRemaining)} ÷ ${months}</div></div>
+      </div>
+      <div class="bcard kevin">
+        <div class="bname">Kevin</div>
+        <div class="bg"><div class="bg-l"><span>Progress toward fair share</span><span>${kevinPct.toFixed(1)}%</span></div>
+          <div class="bar-track"><div class="bar-seg spay" style="width:${kevinPct.toFixed(1)}%"></div><div class="bar-seg srem" style="width:${Math.max(0,100-kevinPct).toFixed(1)}%"></div></div>
+        </div>
+        <div class="bk-rows">
+          <div class="bk-row"><div class="bk-c"><div class="dot" style="background:var(--kevin)"></div>Fair share (post-credits)</div><div class="bk-v">${fmt(eachOwes)}</div></div>
+          <div class="bk-row"><div class="bk-c"><div class="dot" style="background:var(--payments)"></div>Furniture payments</div><div class="bk-v" style="color:var(--green)">${fmt(data.kevinFurnPaid)}</div></div>
+          <div class="bk-row"><div class="bk-c"><div class="dot" style="background:var(--kevin)"></div>Personal payments</div><div class="bk-v" style="color:var(--muted)">${fmt(data.kevinPersPaid)}</div></div>
+          <div class="bk-row"><div class="bk-c" style="font-size:10px;padding-left:4px;color:var(--muted)">Personal pmts don't reduce furniture</div><div class="bk-v"></div></div>
+        </div>
+        <div class="bk-div"><span>Furniture remaining</span><span>${fmt(kevinRemaining)}</span></div>
+        <div class="pbox"><div class="pb-l">Monthly target · ${months} months</div><div class="pb-v">${fmt(kevinRemaining/months)}<span>/mo</span></div><div class="pb-s">${fmt(kevinRemaining)} ÷ ${months}</div></div>
+      </div>
+    </div>
+    <div class="note">
+      Credits applied before split: ${fmt(totalCredits)} total. Each person's fair share reduced by ${fmt(totalCredits/2)}.<br>
+      Amex Split Credits (${fmt(data.kevinSplitCredits)} from Kevin via Venmo) applied to Kurt's utilities — Con Edison reimbursements.<br>
+      <span class="warn">⚑ Kurt paid ${fmt(data.kurtTicket)} for Kevin's plane ticket — applied as a credit toward Kurt's furniture balance.</span>
+    </div>
+    <div class="sec"><div class="sec-t">Shared furniture purchases</div><div class="sec-l"></div></div>
+    <table>
+      <thead><tr><th>Date</th><th>Merchant</th><th>Charged by</th><th>Total</th><th>Each (50%)</th></tr></thead>
+      <tbody>${furnRows}</tbody>
+      <tfoot>
+        <tr><td colspan="2">Gross total</td><td></td><td>${fmt(grossFurn)}</td><td>${fmt(grossFurn/2)}</td></tr>
+        <tr><td colspan="2">Less credits (pre-split)</td><td></td><td style="color:var(--green)">−${fmt(totalCredits)}</td><td style="color:var(--green)">−${fmt(totalCredits/2)}</td></tr>
+        <tr><td colspan="2">Net total</td><td></td><td>${fmt(netFurn)}</td><td>${fmt(eachOwes)}</td></tr>
+      </tfoot>
+    </table>
+    <div class="sec"><div class="sec-t">Kevin's personal charges</div><div class="sec-l"></div></div>
+    <div class="personal-card kevin-card">
+      <div class="pc-header"><div class="pc-name">Kevin — Personal</div><div class="pc-total">Total charged: <span>${fmt(kevinPersTotal)}</span></div></div>
+      <table><thead><tr><th>Date</th><th>Merchant</th><th>Category</th><th>Amount</th></tr></thead><tbody>${kevinPersRows}</tbody><tfoot><tr><td colspan="3">Total personal charges</td><td>${fmt(kevinPersTotal)}</td></tr></tfoot></table>
+      <div class="status-box">
+        <div class="status-item owed"><div class="si-l">Total charged</div><div class="si-v">${fmt(kevinPersTotal)}</div></div>
+        <div class="status-item paid"><div class="si-l">Payments applied</div><div class="si-v">${fmt(data.kevinPersPaid)}</div></div>
+        <div class="status-item ${kevinPersRemaining<=0?'cleared':'remaining'}"><div class="si-l">${kevinPersRemaining<=0?'Balance':'Still remaining'}</div><div class="si-v">${kevinPersRemaining<=0?'$0.00 ✓':fmt(kevinPersRemaining)}</div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-t">Kurt's utilities</div><div class="sec-l"></div></div>
+    <div class="personal-card util-card">
+      <div class="pc-header"><div class="pc-name">Kurt — Utilities (Con Edison)</div><div class="pc-total">Total charged: <span>${fmt(kurtUtilTotal)}</span></div></div>
+      <table><thead><tr><th>Date</th><th>Merchant</th><th>Category</th><th>Amount</th></tr></thead><tbody>${kurtUtilRows}</tbody><tfoot><tr><td colspan="3">Total utilities</td><td>${fmt(kurtUtilTotal)}</td></tr></tfoot></table>
+      <div class="status-box">
+        <div class="status-item owed"><div class="si-l">Total charged</div><div class="si-v">${fmt(kurtUtilTotal)}</div></div>
+        <div class="status-item paid"><div class="si-l">Direct payments</div><div class="si-v">${fmt(data.kurtUtilPaid)}</div></div>
+        <div class="status-item split"><div class="si-l">Kevin split credits</div><div class="si-v">${fmt(data.kevinSplitCredits)}</div></div>
+        <div class="status-item ${utilCleared?'cleared':'remaining'}"><div class="si-l">${utilCleared?'Balance':'Still remaining'}</div><div class="si-v">${utilCleared?'$0.00 ✓':fmt(kurtUtilRemaining)}</div></div>
+      </div>
+      <div class="note" style="margin-top:12px">Direct payments: ${fmt(data.kurtUtilPaid)} · Kevin's split credits: ${fmt(data.kevinSplitCredits)} · Total applied: ${fmt(kurtUtilApplied)}<br>${utilCleared?'<strong style="color:var(--green)">Utilities fully cleared ✓</strong>':`Remaining: <strong style="color:var(--gold)">${fmt(kurtUtilRemaining)}</strong>`}</div>
+    </div>
+    <div class="sec"><div class="sec-t">Kurt's personal charges</div><div class="sec-l"></div></div>
+    <div class="personal-card kurt-card">
+      <div class="pc-header"><div class="pc-name">Kurt — Personal</div><div class="pc-total">Total charged: <span>${fmt(kurtPersTotal)}</span></div></div>
+      <table><thead><tr><th>Date</th><th>Merchant</th><th>Category</th><th>Amount</th></tr></thead><tbody>${kurtPersRows}</tbody><tfoot><tr><td colspan="3">Total personal charges</td><td>${fmt(kurtPersTotal)}</td></tr></tfoot></table>
+      <div class="status-box">
+        <div class="status-item owed"><div class="si-l">Total charged</div><div class="si-v">${fmt(kurtPersTotal)}</div></div>
+        <div class="status-item paid"><div class="si-l">Payment applied</div><div class="si-v">${fmt(data.kurtPersPaid)}</div></div>
+        <div class="status-item ${persCleared?'cleared':'remaining'}"><div class="si-l">${persCleared?'Balance':'Still remaining'}</div><div class="si-v">${persCleared?'$0.00 ✓':fmt(kurtPersRemaining)}</div></div>
+      </div>
+      ${persCleared?'<div class="note" style="margin-top:12px">Personal balance fully cleared ✓</div>':''}
+    </div>
+    <div class="sec"><div class="sec-t">Credits applied to furniture balance</div><div class="sec-l"></div></div>
+    <table><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead><tbody>${creditRows}</tbody><tfoot><tr><td colspan="3">Total credits (shared equally)</td><td>${fmt(totalCredits)}</td></tr></tfoot></table>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
