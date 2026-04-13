@@ -36,8 +36,6 @@ h1 span{color:var(--gold)}
 .btn-save:hover{background:#d4b055}
 .add-row-btn{background:none;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;padding:7px 14px;border-radius:3px;cursor:pointer;margin-top:6px}
 .add-row-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
-.charge-header{display:grid;gap:8px;margin-bottom:6px}
-.charge-header span{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
 .apr-banner{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.22);border-radius:4px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .apr-l{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:3px}
 .apr-t{font-size:13px;color:var(--cream)}
@@ -82,6 +80,7 @@ h1 span{color:var(--gold)}
 .pb-s{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5}
 .note{font-size:10px;color:var(--muted);margin-top:10px;padding:9px 11px;border-left:2px solid var(--border);line-height:1.8}
 .warn{color:rgba(201,168,76,.8)}
+.alert{color:rgba(192,97,74,.9)}
 .personal-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:14px}
 .personal-card.kurt-card{border-top:2px solid var(--kurt)}
 .personal-card.kevin-card{border-top:2px solid var(--kevin)}
@@ -120,6 +119,7 @@ tfoot td{padding-top:12px;border-top:1px solid var(--gold-dim);border-bottom:non
 .bkv{background:rgba(201,122,91,.14);color:var(--kevin);border:1px solid rgba(201,122,91,.23)}
 .bcr{background:rgba(90,158,114,.12);color:var(--green);border:1px solid rgba(90,158,114,.2)}
 .butil{background:rgba(122,158,110,.12);color:var(--util);border:1px solid rgba(122,158,110,.2)}
+.bfee{background:rgba(192,97,74,.12);color:var(--red);border:1px solid rgba(192,97,74,.2)}
 footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);letter-spacing:.07em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
 @media(max-width:600px){.grid2,.top-stats,.credits-strip,.field-grid{grid-template-columns:1fr}.status-box{flex-direction:column}}
 </style>
@@ -197,8 +197,8 @@ footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-
 
 <div id="dashboard"></div>
 <footer>
-  <span>Statements: Nov 12 · Dec 12, 2025 · Jan 13 · Feb 10 · Mar 13, 2026 · Activity Apr 5, 2026</span>
-  <span id="footer-updated">50/50 split after credits · Updated Apr 5, 2026</span>
+  <span>Statements: Nov 12 · Dec 12, 2025 · Jan 13 · Feb 10 · Mar 13 · Apr 12, 2026</span>
+  <span id="footer-updated">50/50 split after credits · Updated Apr 13, 2026</span>
 </footer>
 </div>
 
@@ -238,6 +238,12 @@ let data = {
     {date:'Mar 31, 2026',desc:'Swarthmore College · Education',amount:138.00},
     {date:'Apr 03, 2026',desc:'Uber Eats · Dining',amount:36.09},
     {date:'Apr 03, 2026',desc:"BJ's Wholesale · Personal",amount:162.44},
+    {date:'Apr 06, 2026',desc:'Uber Eats · Dining',amount:20.02},
+    {date:'Apr 06, 2026',desc:'Pocket Bar NYC · Dining/Bar',amount:15.80},
+    {date:'Apr 08, 2026',desc:'Amazon.com · Merchandise',amount:124.06},
+    {date:'Apr 08, 2026',desc:'Amazon.com · Merchandise',amount:44.61},
+    {date:'Apr 08, 2026',desc:'Amazon Marketplace · Merchandise',amount:23.94},
+    {date:'Apr 09, 2026',desc:'Returned Payment Fee ×2 · Fee',amount:58.00},
   ],
   kurtUtils:[
     {date:'Dec 01, 2025',desc:'Con Edison',amount:122.99},
@@ -248,14 +254,14 @@ let data = {
   kurtUtilPaid:267.16, kevinSplitCredits:267.26,
   kurtPersonal:[{date:'Jan 17, 2026',desc:'Wayfair · Personal purchase',amount:127.38}],
   kurtPersPaid:127.38,
-  aprDeadline:'October 12, 2026', monthsRemaining:6, updatedLabel:'Apr 5, 2026',
+  aprDeadline:'October 12, 2026', monthsRemaining:5, updatedLabel:'Apr 13, 2026',
 };
 
 const $=id=>document.getElementById(id);
 const fmt=n=>'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const sum=arr=>arr.reduce((a,b)=>a+b,0);
-const inp=()=>`style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--cream);font-family:'DM Mono',monospace;font-size:11px;padding:6px 8px;border-radius:3px;outline:none;width:100%;"`;
-const delbtn=()=>`style="background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;width:28px;height:28px;border-radius:3px;cursor:pointer;"`;
+const is=()=>`style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--cream);font-family:'DM Mono',monospace;font-size:11px;padding:6px 8px;border-radius:3px;outline:none;width:100%;"`;
+const db=()=>`style="background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;width:28px;height:28px;border-radius:3px;cursor:pointer;"`;
 
 function buildFurnitureRows(){
   const c=$('furniture-rows'); c.innerHTML='';
@@ -266,7 +272,7 @@ function buildFurnitureRows(){
   data.furniture.forEach((item,i)=>{
     const r=document.createElement('div');
     r.style.cssText='display:grid;grid-template-columns:110px 1fr 80px 70px 28px;gap:8px;align-items:center;margin-bottom:8px;';
-    r.innerHTML=`<input type="text" value="${item.date}" ${inp()} oninput="data.furniture[${i}].date=this.value"><input type="text" value="${item.desc}" ${inp()} oninput="data.furniture[${i}].desc=this.value"><input type="number" value="${item.amount}" step="0.01" ${inp()} oninput="data.furniture[${i}].amount=parseFloat(this.value)||0"><input type="text" value="${item.by}" ${inp()} oninput="data.furniture[${i}].by=this.value"><button ${delbtn()} onclick="data.furniture.splice(${i},1);buildFurnitureRows()">×</button>`;
+    r.innerHTML=`<input type="text" value="${item.date}" ${is()} oninput="data.furniture[${i}].date=this.value"><input type="text" value="${item.desc}" ${is()} oninput="data.furniture[${i}].desc=this.value"><input type="number" value="${item.amount}" step="0.01" ${is()} oninput="data.furniture[${i}].amount=parseFloat(this.value)||0"><input type="text" value="${item.by}" ${is()} oninput="data.furniture[${i}].by=this.value"><button ${db()} onclick="data.furniture.splice(${i},1);buildFurnitureRows()">×</button>`;
     c.appendChild(r);
   });
 }
@@ -276,7 +282,7 @@ function buildSimpleRows(cid,arr,key){
   arr.forEach((item,i)=>{
     const r=document.createElement('div');
     r.style.cssText='display:grid;grid-template-columns:130px 1fr 90px 28px;gap:8px;align-items:center;margin-bottom:8px;';
-    r.innerHTML=`<input type="text" value="${item.date}" ${inp()} oninput="data.${key}[${i}].date=this.value"><input type="text" value="${item.desc}" ${inp()} oninput="data.${key}[${i}].desc=this.value"><input type="number" value="${item.amount}" step="0.01" ${inp()} oninput="data.${key}[${i}].amount=parseFloat(this.value)||0"><button ${delbtn()} onclick="data.${key}.splice(${i},1);buildSimpleRows('${cid}',data.${key},'${key}')">×</button>`;
+    r.innerHTML=`<input type="text" value="${item.date}" ${is()} oninput="data.${key}[${i}].date=this.value"><input type="text" value="${item.desc}" ${is()} oninput="data.${key}[${i}].desc=this.value"><input type="number" value="${item.amount}" step="0.01" ${is()} oninput="data.${key}[${i}].amount=parseFloat(this.value)||0"><button ${db()} onclick="data.${key}.splice(${i},1);buildSimpleRows('${cid}',data.${key},'${key}')">×</button>`;
     c.appendChild(r);
   });
 }
@@ -320,7 +326,7 @@ function saveAndRender(){
   data.kevinSplitCredits=parseFloat($('kevin-split-credits').value)||0;
   data.kurtPersPaid=parseFloat($('kurt-pers-paid').value)||0;
   data.aprDeadline=$('apr-deadline').value;
-  data.monthsRemaining=parseInt($('months-remaining').value)||6;
+  data.monthsRemaining=parseInt($('months-remaining').value)||5;
   data.updatedLabel=$('updated-label').value;
   closeModal(); render();
 }
@@ -348,7 +354,13 @@ function render(){
 
   const furnRows=data.furniture.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge ${r.by==='Kurt'?'bk':'bkv'}">${r.by}</span></td><td>${fmt(r.amount)}</td><td>${fmt(r.amount/2)}</td></tr>`).join('');
   const creditRows=data.credits.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge bcr">Credit</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
-  const kevinPersRows=data.kevinPersonal.map(r=>{const[m,c]=r.desc.split('·').map(s=>s.trim());return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td style="color:var(--muted);font-size:11px">${c||''}</td><td>${fmt(r.amount)}</td></tr>`;}).join('');
+
+  const kevinPersRows=data.kevinPersonal.map(r=>{
+    const[m,c]=r.desc.split('·').map(s=>s.trim());
+    const isFee=c&&c.toLowerCase().includes('fee');
+    return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td><span class="badge ${isFee?'bfee':'bkv'}" style="font-size:9px">${c||''}</span></td><td>${fmt(r.amount)}</td></tr>`;
+  }).join('');
+
   const kurtUtilRows=data.kurtUtils.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge butil">Utilities</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
   const kurtPersRows=data.kurtPersonal.map(r=>{const[m,c]=r.desc.split('·').map(s=>s.trim());return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td style="color:var(--muted);font-size:11px">${c||''}</td><td>${fmt(r.amount)}</td></tr>`;}).join('');
 
@@ -404,7 +416,8 @@ function render(){
     <div class="note">
       Credits applied before split: ${fmt(totalCredits)} total. Each person's fair share reduced by ${fmt(totalCredits/2)}.<br>
       Amex Split Credits (${fmt(data.kevinSplitCredits)} from Kevin via Venmo) applied to Kurt's utilities — Con Edison reimbursements.<br>
-      <span class="warn">⚑ Kurt paid ${fmt(data.kurtTicket)} for Kevin's plane ticket — applied as a credit toward Kurt's furniture balance.</span>
+      <span class="warn">⚑ Kurt paid ${fmt(data.kurtTicket)} for Kevin's plane ticket — applied as a credit toward Kurt's furniture balance.</span><br>
+      <span class="alert">⚠ Kevin's Apr 8 payments of $150.00 and $20.02 were returned (bounced). Two $29.00 returned payment fees charged to Kurt's account — added to Kevin's personal balance.</span>
     </div>
     <div class="sec"><div class="sec-t">Shared furniture purchases</div><div class="sec-l"></div></div>
     <table>
@@ -425,6 +438,7 @@ function render(){
         <div class="status-item paid"><div class="si-l">Payments applied</div><div class="si-v">${fmt(data.kevinPersPaid)}</div></div>
         <div class="status-item ${kevinPersRemaining<=0?'cleared':'remaining'}"><div class="si-l">${kevinPersRemaining<=0?'Balance':'Still remaining'}</div><div class="si-v">${kevinPersRemaining<=0?'$0.00 ✓':fmt(kevinPersRemaining)}</div></div>
       </div>
+      <div class="note" style="margin-top:12px"><span class="alert">Includes $58.00 in returned payment fees caused by Kevin's bounced Apr 8 payments — charged to Kurt's account.</span></div>
     </div>
     <div class="sec"><div class="sec-t">Kurt's utilities</div><div class="sec-l"></div></div>
     <div class="personal-card util-card">
