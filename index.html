@@ -198,7 +198,7 @@ footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-
 <div id="dashboard"></div>
 <footer>
   <span>Statements: Nov 12 · Dec 12, 2025 · Jan 13 · Feb 10 · Mar 13 · Apr 12, 2026</span>
-  <span id="footer-updated">50/50 split after credits · Updated Apr 13, 2026</span>
+  <span id="footer-updated">50/50 split after credits · Updated Apr 22, 2026</span>
 </footer>
 </div>
 
@@ -219,8 +219,9 @@ let data = {
     {date:'Jan 22, 2026',desc:'Amex cash rebate',amount:4.76},
     {date:'Feb 19, 2026',desc:'Amex cash rebate',amount:3.10},
     {date:'Mar 26, 2026',desc:'Amex cash rebate',amount:2.06},
+    {date:'Apr 19, 2026',desc:'Amex cash rebate',amount:7.59},
   ],
-  kurtFurnPaid:675.00, kurtTicket:300.00,
+  kurtFurnPaid:875.00, kurtTicket:300.00,
   kevinFurnPaid:140.00, kevinPersPaid:562.00,
   kevinPersonal:[
     {date:'Nov 11, 2025',desc:'Mess Hall · Dining',amount:31.41},
@@ -243,7 +244,9 @@ let data = {
     {date:'Apr 08, 2026',desc:'Amazon.com · Merchandise',amount:124.06},
     {date:'Apr 08, 2026',desc:'Amazon.com · Merchandise',amount:44.61},
     {date:'Apr 08, 2026',desc:'Amazon Marketplace · Merchandise',amount:23.94},
-    {date:'Apr 09, 2026',desc:'Returned Payment Fee ×2 · Fee',amount:58.00},
+    {date:'Apr 09, 2026',desc:'Returned Payment Fee (1 of 2) · Fee',amount:29.00},
+    {date:'Apr 12, 2026',desc:'Associated Supermarket · Groceries',amount:2.22},
+    {date:'Apr 12, 2026',desc:'Columbus Foods · Groceries',amount:5.48},
   ],
   kurtUtils:[
     {date:'Dec 01, 2025',desc:'Con Edison',amount:122.99},
@@ -254,7 +257,7 @@ let data = {
   kurtUtilPaid:267.16, kevinSplitCredits:267.26,
   kurtPersonal:[{date:'Jan 17, 2026',desc:'Wayfair · Personal purchase',amount:127.38}],
   kurtPersPaid:127.38,
-  aprDeadline:'October 12, 2026', monthsRemaining:5, updatedLabel:'Apr 13, 2026',
+  aprDeadline:'October 12, 2026', monthsRemaining:5, updatedLabel:'Apr 22, 2026',
 };
 
 const $=id=>document.getElementById(id);
@@ -354,13 +357,11 @@ function render(){
 
   const furnRows=data.furniture.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge ${r.by==='Kurt'?'bk':'bkv'}">${r.by}</span></td><td>${fmt(r.amount)}</td><td>${fmt(r.amount/2)}</td></tr>`).join('');
   const creditRows=data.credits.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge bcr">Credit</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
-
   const kevinPersRows=data.kevinPersonal.map(r=>{
     const[m,c]=r.desc.split('·').map(s=>s.trim());
     const isFee=c&&c.toLowerCase().includes('fee');
     return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td><span class="badge ${isFee?'bfee':'bkv'}" style="font-size:9px">${c||''}</span></td><td>${fmt(r.amount)}</td></tr>`;
   }).join('');
-
   const kurtUtilRows=data.kurtUtils.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge butil">Utilities</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
   const kurtPersRows=data.kurtPersonal.map(r=>{const[m,c]=r.desc.split('·').map(s=>s.trim());return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td style="color:var(--muted);font-size:11px">${c||''}</td><td>${fmt(r.amount)}</td></tr>`;}).join('');
 
@@ -417,7 +418,7 @@ function render(){
       Credits applied before split: ${fmt(totalCredits)} total. Each person's fair share reduced by ${fmt(totalCredits/2)}.<br>
       Amex Split Credits (${fmt(data.kevinSplitCredits)} from Kevin via Venmo) applied to Kurt's utilities — Con Edison reimbursements.<br>
       <span class="warn">⚑ Kurt paid ${fmt(data.kurtTicket)} for Kevin's plane ticket — applied as a credit toward Kurt's furniture balance.</span><br>
-      <span class="alert">⚠ Kevin's Apr 8 payments of $150.00 and $20.02 were returned (bounced). Two $29.00 returned payment fees charged to Kurt's account — added to Kevin's personal balance.</span>
+      <span class="alert">⚠ One of Kevin's two Apr 8 returned payment fees ($29) was waived by Amex. One $29 fee remains charged to Kurt's account and is included in Kevin's personal balance.</span>
     </div>
     <div class="sec"><div class="sec-t">Shared furniture purchases</div><div class="sec-l"></div></div>
     <table>
@@ -438,7 +439,7 @@ function render(){
         <div class="status-item paid"><div class="si-l">Payments applied</div><div class="si-v">${fmt(data.kevinPersPaid)}</div></div>
         <div class="status-item ${kevinPersRemaining<=0?'cleared':'remaining'}"><div class="si-l">${kevinPersRemaining<=0?'Balance':'Still remaining'}</div><div class="si-v">${kevinPersRemaining<=0?'$0.00 ✓':fmt(kevinPersRemaining)}</div></div>
       </div>
-      <div class="note" style="margin-top:12px"><span class="alert">Includes $58.00 in returned payment fees caused by Kevin's bounced Apr 8 payments — charged to Kurt's account.</span></div>
+      <div class="note" style="margin-top:12px"><span class="alert">Includes $29.00 returned payment fee (1 of 2 waived by Amex) — charged to Kurt's account.</span></div>
     </div>
     <div class="sec"><div class="sec-t">Kurt's utilities</div><div class="sec-l"></div></div>
     <div class="personal-card util-card">
