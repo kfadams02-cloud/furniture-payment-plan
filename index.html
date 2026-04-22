@@ -134,7 +134,7 @@ footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-
   </div>
   <button class="edit-btn" onclick="openModal()">⊞ Update Data</button>
 </header>
-
+ 
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h2>Update Dashboard</h2>
@@ -194,14 +194,14 @@ footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-
     </div>
   </div>
 </div>
-
+ 
 <div id="dashboard"></div>
 <footer>
   <span>Statements: Nov 12 · Dec 12, 2025 · Jan 13 · Feb 10 · Mar 13 · Apr 12, 2026</span>
   <span id="footer-updated">50/50 split after credits · Updated Apr 22, 2026</span>
 </footer>
 </div>
-
+ 
 <script>
 let data = {
   furniture:[
@@ -259,13 +259,13 @@ let data = {
   kurtPersPaid:127.38,
   aprDeadline:'October 12, 2026', monthsRemaining:5, updatedLabel:'Apr 22, 2026',
 };
-
+ 
 const $=id=>document.getElementById(id);
 const fmt=n=>'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const sum=arr=>arr.reduce((a,b)=>a+b,0);
 const is=()=>`style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--cream);font-family:'DM Mono',monospace;font-size:11px;padding:6px 8px;border-radius:3px;outline:none;width:100%;"`;
 const db=()=>`style="background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;width:28px;height:28px;border-radius:3px;cursor:pointer;"`;
-
+ 
 function buildFurnitureRows(){
   const c=$('furniture-rows'); c.innerHTML='';
   const h=document.createElement('div');
@@ -279,7 +279,7 @@ function buildFurnitureRows(){
     c.appendChild(r);
   });
 }
-
+ 
 function buildSimpleRows(cid,arr,key){
   const c=$(cid); c.innerHTML='';
   arr.forEach((item,i)=>{
@@ -289,7 +289,7 @@ function buildSimpleRows(cid,arr,key){
     c.appendChild(r);
   });
 }
-
+ 
 function addRow(type){
   const blank={date:'',desc:'',amount:0};
   if(type==='furniture'){data.furniture.push({...blank,by:''});buildFurnitureRows();}
@@ -298,7 +298,7 @@ function addRow(type){
   else if(type==='kurt-util'){data.kurtUtils.push({...blank});buildSimpleRows('kurt-util-rows',data.kurtUtils,'kurtUtils');}
   else if(type==='kurt-personal'){data.kurtPersonal.push({...blank});buildSimpleRows('kurt-personal-rows',data.kurtPersonal,'kurtPersonal');}
 }
-
+ 
 function openModal(){
   buildFurnitureRows();
   buildSimpleRows('credit-rows',data.credits,'credits');
@@ -317,9 +317,9 @@ function openModal(){
   $('updated-label').value=data.updatedLabel;
   $('modal').classList.add('open');
 }
-
+ 
 function closeModal(){$('modal').classList.remove('open');}
-
+ 
 function saveAndRender(){
   data.kurtFurnPaid=parseFloat($('kurt-furn-paid').value)||0;
   data.kurtTicket=parseFloat($('kurt-ticket').value)||0;
@@ -333,7 +333,7 @@ function saveAndRender(){
   data.updatedLabel=$('updated-label').value;
   closeModal(); render();
 }
-
+ 
 function render(){
   const grossFurn=sum(data.furniture.map(x=>x.amount));
   const totalCredits=sum(data.credits.map(x=>x.amount));
@@ -354,7 +354,7 @@ function render(){
   const kurtPersTotal=sum(data.kurtPersonal.map(x=>x.amount));
   const kurtPersRemaining=kurtPersTotal-data.kurtPersPaid;
   const persCleared=kurtPersRemaining<=0.01;
-
+ 
   const furnRows=data.furniture.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge ${r.by==='Kurt'?'bk':'bkv'}">${r.by}</span></td><td>${fmt(r.amount)}</td><td>${fmt(r.amount/2)}</td></tr>`).join('');
   const creditRows=data.credits.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge bcr">Credit</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
   const kevinPersRows=data.kevinPersonal.map(r=>{
@@ -364,9 +364,9 @@ function render(){
   }).join('');
   const kurtUtilRows=data.kurtUtils.map(r=>`<tr><td class="tx-date">${r.date}</td><td>${r.desc}</td><td><span class="badge butil">Utilities</span></td><td>${fmt(r.amount)}</td></tr>`).join('');
   const kurtPersRows=data.kurtPersonal.map(r=>{const[m,c]=r.desc.split('·').map(s=>s.trim());return`<tr><td class="tx-date">${r.date}</td><td>${m}</td><td style="color:var(--muted);font-size:11px">${c||''}</td><td>${fmt(r.amount)}</td></tr>`;}).join('');
-
+ 
   $('footer-updated').textContent=`50/50 split after credits · Updated ${data.updatedLabel}`;
-
+ 
   $('dashboard').innerHTML=`
     <div class="apr-banner">
       <div><div class="apr-l">0% Intro APR window</div><div class="apr-t">Expires <strong>${data.aprDeadline}</strong> — pay off before interest kicks in</div></div>
@@ -468,7 +468,7 @@ function render(){
     <table><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead><tbody>${creditRows}</tbody><tfoot><tr><td colspan="3">Total credits (shared equally)</td><td>${fmt(totalCredits)}</td></tr></tfoot></table>
   `;
 }
-
+ 
 render();
 </script>
 </body>
